@@ -34,7 +34,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent"
     ],
-    packages=["medium_multiply"],
+    packages=["interactive_trader"],
     include_package_data=True,
     install_requires=["pandas", "dash", "ibapi"]
 )
