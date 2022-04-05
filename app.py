@@ -204,13 +204,19 @@ def async_handler(async_status, master_client_id, port, hostname):
         Input('contract-sec-type', 'value'),
         Input('contract-currency', 'value'),
         Input('contract-exchange', 'value'),
-        Input('contract-primary-exchange', 'value')
+        Input('contract-primary-exchange', 'value'),
+        Input('order-action', 'value'),
+        Input('order-type', 'value'),
+        Input('order-size', 'value'),
+        Input('order-lmt-price', 'value'),
+        Input('order-account', 'value')
     ],
     prevent_initial_call = True
 )
 def place_order(n_clicks, contract_symbol, contract_sec_type,
                 contract_currency, contract_exchange,
-                contract_primary_exchange):
+                contract_primary_exchange, order_action, order_type,
+                order_size, order_lmt_price, order_account):
 
     # Contract object: STOCK
     contract = Contract()
@@ -222,23 +228,15 @@ def place_order(n_clicks, contract_symbol, contract_sec_type,
 
     # Example LIMIT Order
     order = Order()
-    order.action = "SELL"
-    order.orderType = "LMT"
-    order.totalQuantity = 100
-    order.lmtPrice = 1105
+    order.action = order_action
+    order.orderType = order_type
+    order.totalQuantity = order_size
 
-    ##### FA Accounts #####
-    # If you're a financial advisor (FA) then you're not finished creating your
-    # orders at this point because you need to answer the question: which account
-    # would you like to place the order on? All of them? Just one? Several? There
-    # are a few ways to do this, for example, by using GROUPS: https://www.interactivebrokers.com/en/software/advisors/topics/accountgroups.htm
-    # But probably the easiest way is to just pass in the ID of the account you
-    # want to use, like this:
-    order.account = 'DU1267861'
-    # Don't want to mess this one up because your clients all signed up for
-    # different strategies. You don't want to accidentally make trades for your
-    # wild options strategy using the account owned by your conservative, careful
-    # client who only trades index funds and dividend-paying stocks in the SP500!
+    if order_type == 'LMT':
+        order.lmtPrice = order_lmt_price
+
+    if order_account:
+        order.account = order_account
 
     ibkr_async_conn.reqIds(1)
 
