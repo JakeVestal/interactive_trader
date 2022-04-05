@@ -26,17 +26,10 @@ class ibkr_app(EWrapper, EClient):
         self.contract_details_end = None
         self.matching_symbols = None
         self.order_status = pd.DataFrame(
-            columns=['orderId', 'status', 'filled', 'remaining', 'avgFillPrice',
-                     'permId', 'parentId', 'lastFillPrice', 'clientId',
-                     'whyHeld', 'mktCapPrice']
+            columns=['order_id', 'perm_id', 'status', 'filled', 'remaining',
+                     'avg_fill_price', 'parent_id', 'last_fill_price',
+                     'client_id', 'why_held', 'mkt_cap_price']
         )
-        self.order_id_open = ""
-        self.contract_open = ""
-        self.order_open = ""
-        self.order_state_open = ""
-        self.contract_completed = ""
-        self.order_completed = ""
-        self.order_state_completed = ""
 
 
     def error(self, reqId:TickerId, errorCode:int, errorString:str):
@@ -131,16 +124,17 @@ class ibkr_app(EWrapper, EClient):
                     remaining:float, avgFillPrice:float, permId:int,
                     parentId:int, lastFillPrice:float, clientId:int,
                     whyHeld:str, mktCapPrice: float):
+        print('orderStatus hello')
         self.order_status = pd.concat(
             [
                 self.order_status,
                 pd.DataFrame({
                     'order_id': [orderId],
+                    'perm_id': [permId],
                     'status': [status],
                     'filled': [filled],
                     'remaining': [remaining],
                     'avg_fill_price': [avgFillPrice],
-                    'perm_id': [permId],
                     'parent_id': [parentId],
                     'last_fill_price': [lastFillPrice],
                     'client_id': [clientId],
@@ -151,43 +145,3 @@ class ibkr_app(EWrapper, EClient):
             ignore_index=True
         )
         self.order_status.drop_duplicates(inplace=True)
-
-    def openOrder(self, orderId:OrderId, contract:Contract, order:Order,
-                  orderState:OrderState):
-        # self.order_status = pd.concat(
-        #     [
-        #         self.order_status,
-        #         pd.DataFrame({
-        #             'order_id': [orderId],
-        #             'status': [orderState.status],
-        #             'filled': [filled],
-        #             'remaining': [remaining],
-        #             'avg_fill_price': [avgFillPrice],
-        #             'perm_id': [permId],
-        #             'parent_id': [parentId],
-        #             'last_fill_price': [lastFillPrice],
-        #             'client_id': [clientId],
-        #             'why_held': [whyHeld],
-        #             'mkt_cap_price': [mktCapPrice]
-        #         })
-        #     ],
-        #     ignore_index=True
-        # )
-        self.order_id_open = orderId
-        self.contract_open = contract
-        self.order_open = order
-        self.order_state_open = orderState
-
-    def openOrderEnd(self):
-        print('openOrder')
-
-    def completedOrder(self, contract:Contract, order:Order,
-                       orderState:OrderState):
-        self.contract_completed = contract
-        self.order_completed = order
-        self.order_state_completed = orderState
-
-
-
-
-
