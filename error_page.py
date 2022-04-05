@@ -1,3 +1,10 @@
-from dash import html
+from dash import dash_table
+import pandas as pd
 
-error_page = html.P("Page 3 content goes here")
+errors = pd.DataFrame(columns=['reqId', 'errorCode', 'errorString'])
+
+error_page = dash_table.DataTable(
+    columns=[{"name": i, "id": i} for i in errors.columns],
+    data=errors.to_dict('records'),
+    id='errors-dt'
+)

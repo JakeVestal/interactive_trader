@@ -34,6 +34,8 @@ CONTENT_STYLE1 = {
 }
 
 order_status = ""
+errors = ""
+connected = ""
 
 ibkr_async_conn = ibkr_app()
 
@@ -62,12 +64,24 @@ def update_order_status(n_intervals):
     global ibkr_async_conn
     global order_status
 
-    print(ibkr_async_conn.order_status)
-    print(order_status)
-
     order_status = ibkr_async_conn.order_status
 
     df = order_status
+    dt_data = df.to_dict('records')
+    dt_columns = [{"name": i, "id": i} for i in df.columns]
+    return dt_data, dt_columns
+
+@app.callback(
+    [Output('errors-dt', 'data'), Output('errors-dt', 'columns')],
+    Input('ibkr-update-interval', 'n_intervals')
+)
+def update_order_status(n_intervals):
+    global ibkr_async_conn
+    global errors
+
+    errors = ibkr_async_conn.error_messages
+
+    df = errors
     dt_data = df.to_dict('records')
     dt_columns = [{"name": i, "id": i} for i in df.columns]
     return dt_data, dt_columns
@@ -120,7 +134,7 @@ def render_page_content(pathname):
         return page_1
     elif pathname == "/blotter":
         return order_page
-    elif pathname == "/page-3":
+    elif pathname == "/errors":
         return error_page
     # If the user tries to reach a different page, return a 404 message
     return html.Div(
@@ -131,18 +145,23 @@ def render_page_content(pathname):
         ]
     )
 
-@app.callback(Output('ibkr-async-conn-status', 'children'),
-              Input('ibkr-async-conn-status', 'children'))
-def async_handler(async_status):
-
-    print('async handler')
+@app.callback(
+    Output('ibkr-async-conn-status', 'children'),
+    [
+        Input('ibkr-async-conn-status', 'children'),
+        Input('master-client-id', 'value'),
+        Input('port', 'value'),
+        Input('hostname', 'value')
+    ]
+)
+def async_handler(async_status, master_client_id, port, hostname):
 
     if async_status == "CONNECTED":
         raise PreventUpdate
         pass
 
     global ibkr_async_conn
-    ibkr_async_conn.connect('127.0.0.1', 7497, 10645)
+    ibkr_async_conn.connect(hostname, port, master_client_id)
 
     timeout_sec = 5
 
@@ -169,10 +188,13 @@ def async_handler(async_status):
     global order_status
     order_status = ibkr_async_conn.order_status
 
-    print('startup boi')
-    print(order_status)
+    global errors
+    errors = ibkr_async_conn.error_messages
 
-    return str(ibkr_async_conn.isConnected())
+    global connected
+    connected = ibkr_async_conn.isConnected()
+
+    return str(connected)
 
 @app.callback(
     Output('placeholder-div', 'children'),

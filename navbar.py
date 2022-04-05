@@ -21,7 +21,7 @@ navbar = dbc.NavbarSimple(
             label="More",
         ),
     ],
-    brand="Brand",
+    brand="TEAM NAME",
     brand_href="#",
     color="dark",
     dark=True,

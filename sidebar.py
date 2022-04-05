@@ -32,11 +32,6 @@ SIDEBAR_HIDDEN = {
 
 sidebar = html.Div(
     [
-        html.H2("Sidebar", className="display-4"),
-        html.Hr(),
-        html.P(
-            "A simple sidebar layout with navigation links", className="lead"
-        ),
         dbc.Nav(
             [
                 dbc.NavLink(
@@ -52,6 +47,12 @@ sidebar = html.Div(
         ),
         html.P(children="False", id='ibkr-async-conn-status'),
         html.Div(children='', id='placeholder-div'),
+        dbc.Label('Master Client ID'),
+        dbc.Input(id="master-client-id", type="number", value=10645),
+        dbc.Label('Port'),
+        dbc.Input(id="port", type="number", value=7497),
+        dbc.Label('Hostname'),
+        dbc.Input(id="hostname", type="text", value='127.0.0.1'),
         html.Button('Trade', id='trade-button', n_clicks=0),
         html.P(children='', id='uses-async')
     ],
