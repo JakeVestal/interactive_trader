@@ -39,12 +39,16 @@ sidebar = html.Div(
         ),
         dbc.Nav(
             [
-                dbc.NavLink("Page 1", href="/page-1", id="page-1-link"),
-                dbc.NavLink("Page 2", href="/page-2", id="page-2-link"),
-                dbc.NavLink("Page 3", href="/page-3", id="page-3-link"),
+                dbc.NavLink(
+                    "Home Screen",
+                    href="/home-screen",
+                    id="home-screen-link"
+                ),
+                dbc.NavLink("Blotter", href="/blotter", id="blotter-link"),
+                dbc.NavLink("Errors", href="/errors", id="errors-link"),
             ],
             vertical=True,
-            pills=True,
+            pills=True
         ),
         html.P(children="False", id='ibkr-async-conn-status'),
         html.Div(children='', id='placeholder-div'),
@@ -54,4 +58,3 @@ sidebar = html.Div(
     id="sidebar",
     style=SIDEBAR_STYLE
 )
-

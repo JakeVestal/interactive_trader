@@ -124,7 +124,6 @@ class ibkr_app(EWrapper, EClient):
                     remaining:float, avgFillPrice:float, permId:int,
                     parentId:int, lastFillPrice:float, clientId:int,
                     whyHeld:str, mktCapPrice: float):
-        print('orderStatus hello')
         self.order_status = pd.concat(
             [
                 self.order_status,

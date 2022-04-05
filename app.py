@@ -4,7 +4,7 @@ from dash import dcc, html
 from dash.dependencies import Input, Output, State
 from page_1 import page_1
 from order_page import order_page
-from page_3 import page_3
+from error_page import error_page
 from navbar import navbar
 from sidebar import sidebar, SIDEBAR_HIDDEN, SIDEBAR_STYLE
 from dash.dependencies import Input, Output
@@ -15,7 +15,7 @@ from ibapi.contract import Contract
 from ibapi.order import Order
 import time
 import threading
-
+import pandas as pd
 
 CONTENT_STYLE = {
     "transition": "margin-left .5s",
@@ -33,6 +33,8 @@ CONTENT_STYLE1 = {
     "background-color": "#f8f9fa",
 }
 
+order_status = ""
+
 ibkr_async_conn = ibkr_app()
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -43,12 +45,32 @@ app.layout = html.Div(
         dcc.Location(id="url"),
         navbar,
         sidebar,
-        html.Div(
-            id="page-content",
-            style=CONTENT_STYLE
+        html.Div(id="page-content", style=CONTENT_STYLE),
+        dcc.Interval(
+            id = 'ibkr-update-interval',
+            interval=5000,
+            n_intervals=0
         )
     ],
 )
+
+@app.callback(
+    [Output('trade-blotter', 'data'), Output('trade-blotter', 'columns')],
+    Input('ibkr-update-interval', 'n_intervals')
+)
+def update_order_status(n_intervals):
+    global ibkr_async_conn
+    global order_status
+
+    print(ibkr_async_conn.order_status)
+    print(order_status)
+
+    order_status = ibkr_async_conn.order_status
+
+    df = order_status
+    dt_data = df.to_dict('records')
+    dt_columns = [{"name": i, "id": i} for i in df.columns]
+    return dt_data, dt_columns
 
 @app.callback(
     [
@@ -94,14 +116,14 @@ def toggle_active_links(pathname):
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
-    if pathname in ["/", "/page-1"]:
+    if pathname in ["/", "/home-screen"]:
         return page_1
-    elif pathname == "/page-2":
+    elif pathname == "/blotter":
         return order_page
     elif pathname == "/page-3":
-        return page_3
+        return error_page
     # If the user tries to reach a different page, return a 404 message
-    return dbc.Jumbotron(
+    return html.Div(
         [
             html.H1("404: Not found", className="text-danger"),
             html.Hr(),
@@ -112,6 +134,8 @@ def render_page_content(pathname):
 @app.callback(Output('ibkr-async-conn-status', 'children'),
               Input('ibkr-async-conn-status', 'children'))
 def async_handler(async_status):
+
+    print('async handler')
 
     if async_status == "CONNECTED":
         raise PreventUpdate
@@ -142,6 +166,12 @@ def async_handler(async_status):
     while ibkr_async_conn.next_valid_id is None:
         time.sleep(0.01)
 
+    global order_status
+    order_status = ibkr_async_conn.order_status
+
+    print('startup boi')
+    print(order_status)
+
     return str(ibkr_async_conn.isConnected())
 
 @app.callback(
@@ -150,6 +180,8 @@ def async_handler(async_status):
     prevent_initial_call = True
 )
 def place_order(n_clicks):
+
+    print('shouldnt run')
 
     # Contract object: STOCK
     contract_stk = Contract()
