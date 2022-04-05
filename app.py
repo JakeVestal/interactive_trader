@@ -198,27 +198,34 @@ def async_handler(async_status, master_client_id, port, hostname):
 
 @app.callback(
     Output('placeholder-div', 'children'),
-    Input('trade-button', 'n_clicks'),
+    [
+        Input('trade-button', 'n_clicks'),
+        Input('contract-symbol', 'value'),
+        Input('contract-sec-type', 'value'),
+        Input('contract-currency', 'value'),
+        Input('contract-exchange', 'value'),
+        Input('contract-primary-exchange', 'value')
+    ],
     prevent_initial_call = True
 )
-def place_order(n_clicks):
-
-    print('shouldnt run')
+def place_order(n_clicks, contract_symbol, contract_sec_type,
+                contract_currency, contract_exchange,
+                contract_primary_exchange):
 
     # Contract object: STOCK
-    contract_stk = Contract()
-    contract_stk.symbol = "TSLA"
-    contract_stk.secType = "STK"
-    contract_stk.currency = "USD"
-    contract_stk.exchange = "SMART"
-    contract_stk.primaryExchange = "ARCA"
+    contract = Contract()
+    contract.symbol = contract_symbol
+    contract.secType = contract_sec_type
+    contract.currency = contract_currency
+    contract.exchange = contract_exchange
+    contract.primaryExchange = contract_primary_exchange
 
     # Example LIMIT Order
-    lmt_order = Order()
-    lmt_order.action = "SELL"
-    lmt_order.orderType = "LMT"
-    lmt_order.totalQuantity = 100
-    lmt_order.lmtPrice = 1105
+    order = Order()
+    order.action = "SELL"
+    order.orderType = "LMT"
+    order.totalQuantity = 100
+    order.lmtPrice = 1105
 
     ##### FA Accounts #####
     # If you're a financial advisor (FA) then you're not finished creating your
@@ -227,7 +234,7 @@ def place_order(n_clicks):
     # are a few ways to do this, for example, by using GROUPS: https://www.interactivebrokers.com/en/software/advisors/topics/accountgroups.htm
     # But probably the easiest way is to just pass in the ID of the account you
     # want to use, like this:
-    lmt_order.account = 'DU1267861'
+    order.account = 'DU1267861'
     # Don't want to mess this one up because your clients all signed up for
     # different strategies. You don't want to accidentally make trades for your
     # wild options strategy using the account owned by your conservative, careful
@@ -238,8 +245,8 @@ def place_order(n_clicks):
     # Place orders!
     ibkr_async_conn.placeOrder(
         ibkr_async_conn.next_valid_id,
-        contract_stk,
-        lmt_order
+        contract,
+        order
     )
 
     return ''

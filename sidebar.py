@@ -3,18 +3,18 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 SIDEBAR_STYLE = {
-        "position": "fixed",
-        "top": 62.5,
-        "left": 0,
-        "bottom": 0,
-        "width": "16rem",
-        "height": "100%",
-        "z-index": 1,
-        "overflow-x": "hidden",
-        "transition": "all 0.5s",
-        "padding": "0.5rem 1rem",
-        "background-color": "#f8f9fa",
-    }
+    "position": "fixed",
+    "top": 62.5,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "height": "100%",
+    "z-index": 1,
+    "overflow-x": "hidden",
+    "transition": "all 0.5s",
+    "padding": "0.5rem 1rem",
+    "background-color": "#f8f9fa",
+}
 
 SIDEBAR_HIDDEN = {
     "position": "fixed",
@@ -54,7 +54,18 @@ sidebar = html.Div(
         dbc.Label('Hostname'),
         dbc.Input(id="hostname", type="text", value='127.0.0.1'),
         html.Button('Trade', id='trade-button', n_clicks=0),
-        html.P(children='', id='uses-async')
+        html.P(children='', id='uses-async'),
+        html.Hr(),
+        dbc.Label('Contract Symbol'),
+        dbc.Input(id="contract-symbol", type="text", value='TSLA'),
+        dbc.Label('Contract SecType'),
+        dbc.Input(id="contract-sec-type", type="text", value='STK'),
+        dbc.Label('Contract Currency'),
+        dbc.Input(id="contract-currency", type="text", value='USD'),
+        dbc.Label('Contract Exchange'),
+        dbc.Input(id="contract-exchange", type="text", value='SMART'),
+        dbc.Label('Contract Primary Exchange'),
+        dbc.Input(id="contract-primary-exchange", type="text", value='ARCA'),
     ],
     id="sidebar",
     style=SIDEBAR_STYLE
