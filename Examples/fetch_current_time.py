@@ -1,5 +1,5 @@
 
-from fintech_ibkr import *
+from interactive_trader import *
 
 current_time = fetch_current_time()
 

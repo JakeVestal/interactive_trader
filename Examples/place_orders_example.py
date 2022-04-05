@@ -1,7 +1,7 @@
 
 from ibapi.contract import Contract
 from ibapi.order import Order
-from fintech_ibkr import *
+from interactive_trader import *
 
 hostname = '127.0.0.1'
 port = 7497
@@ -42,7 +42,7 @@ lmt_order = Order()
 lmt_order.action = "SELL"
 lmt_order.orderType = "LMT"
 lmt_order.totalQuantity = 100
-lmt_order.lmtPrice = 1012
+lmt_order.lmtPrice = 1120
 
 ##### FA Accounts #####
 # If you're a financial advisor (FA) then you're not finished creating your

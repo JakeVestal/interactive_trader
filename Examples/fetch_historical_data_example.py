@@ -5,7 +5,7 @@
 #  ready to be loaded into the candlestick graph constructor.
 
 from ibapi.contract import Contract
-from fintech_ibkr import *
+from interactive_trader import *
 
 value = "EUR.USD" # This is what your text input looks like on your app
 

@@ -1,6 +1,6 @@
 
 from ibapi.contract import Contract
-from fintech_ibkr import *
+from interactive_trader import *
 import pandas as pd
 
 # Contract object: CURRENCY PAIR

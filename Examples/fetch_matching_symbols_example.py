@@ -1,5 +1,5 @@
 
-from fintech_ibkr import *
+from interactive_trader import *
 
 symbol = "TSLA"
 matching_symbols = fetch_matching_symbols(symbol)

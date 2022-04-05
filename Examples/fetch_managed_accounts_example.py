@@ -1,5 +1,5 @@
 
-from fintech_ibkr import *
+from interactive_trader import *
 
 managed_accounts = fetch_managed_accounts()
 

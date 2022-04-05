@@ -2,6 +2,10 @@
 import pandas as pd
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
+from ibapi.common import *
+from ibapi.contract import *
+from ibapi.order import *
+from ibapi.order_state import OrderState
 from datetime import datetime
 
 # This is the main app that we'll be using for sync and async functions.
@@ -13,15 +17,6 @@ class ibkr_app(EWrapper, EClient):
         ])
         self.next_valid_id = None
         self.current_time = None
-        ########################################################################
-        # Here, you'll need to change Line 30 to initialize
-        # self.historical_data as a dataframe having the column names you
-        # want to use. Clearly, you'll want to make sure your colnames match
-        # with what you tell the candlestick figure to expect when you create
-        # it in your app!
-        # I've already done the same general process you need to go through
-        # in the self.error_messages instance variable, so you can use that as
-        # a guide.
         self.historical_data = pd.DataFrame(
             columns=['date', 'open', 'high', 'low', 'close', 'volume',
                      'bar_count', 'average']
@@ -35,11 +30,16 @@ class ibkr_app(EWrapper, EClient):
                      'permId', 'parentId', 'lastFillPrice', 'clientId',
                      'whyHeld', 'mktCapPrice']
         )
-        self.contract = ""
-        self.order = ""
-        self.order_state = ""
+        self.order_id_open = ""
+        self.contract_open = ""
+        self.order_open = ""
+        self.order_state_open = ""
+        self.contract_completed = ""
+        self.order_completed = ""
+        self.order_state_completed = ""
 
-    def error(self, reqId, errorCode, errorString):
+
+    def error(self, reqId:TickerId, errorCode:int, errorString:str):
         self.error_messages = pd.concat(
             [self.error_messages, pd.DataFrame({
                 "reqId": [reqId],
@@ -47,17 +47,16 @@ class ibkr_app(EWrapper, EClient):
                 "errorString": [errorString]
             })])
 
-    def managedAccounts(self, accountsList):
+    def managedAccounts(self, accountsList:str):
         self.managed_accounts = [i for i in accountsList.split(",") if i]
 
-    def nextValidId(self, orderId: int):
+    def nextValidId(self, orderId:int):
         self.next_valid_id = orderId
 
     def currentTime(self, time:int):
         self.current_time = datetime.fromtimestamp(time)
 
-    def historicalData(self, reqId, bar):
-
+    def historicalData(self, reqId:int, bar:BarData):
         self.historical_data = pd.concat(
             [
                 self.historical_data,
@@ -74,13 +73,13 @@ class ibkr_app(EWrapper, EClient):
             ignore_index=True
         )
 
-    def historicalDataEnd(self, reqId: int, start: str, end: str):
+    def historicalDataEnd(self, reqId:int, start:str, end:str):
         self.historical_data_end = reqId
 
     def contractDetailsEnd(self, reqId: int):
         self.contract_details_end = reqId
 
-    def contractDetails(self, reqId:int, contractDetails):
+    def contractDetails(self, reqId:int, contractDetails:ContractDetails):
         self.contract_details = pd.DataFrame({
             "con_id": [contractDetails.contract.conId],
             "symbol": [contractDetails.contract.symbol],
@@ -104,7 +103,8 @@ class ibkr_app(EWrapper, EClient):
             "liquid_hours": [contractDetails.liquidHours]
         })
 
-    def symbolSamples(self, reqId:int, contractDescriptions):
+    def symbolSamples(self, reqId:int,
+                      contractDescriptions:ListOfContractDescription):
         df = pd.DataFrame(
             columns=[
                 'con_id', 'symbol', 'sec_type', 'primary_exchange', 'currency'
@@ -127,7 +127,7 @@ class ibkr_app(EWrapper, EClient):
             )
         self.matching_symbols = df
 
-    def orderStatus(self, orderId, status:str, filled:float,
+    def orderStatus(self, orderId:OrderId , status:str, filled:float,
                     remaining:float, avgFillPrice:float, permId:int,
                     parentId:int, lastFillPrice:float, clientId:int,
                     whyHeld:str, mktCapPrice: float):
@@ -152,30 +152,41 @@ class ibkr_app(EWrapper, EClient):
         )
         self.order_status.drop_duplicates(inplace=True)
 
-    def openOrder(self, orderId, contract, order, orderState):
-        self.order_status = pd.concat(
-            [
-                self.order_status,
-                pd.DataFrame({
-                    'order_id': [orderId],
-                    'status': [orderState.status],
-                    'filled': [filled],
-                    'remaining': [remaining],
-                    'avg_fill_price': [avgFillPrice],
-                    'perm_id': [permId],
-                    'parent_id': [parentId],
-                    'last_fill_price': [lastFillPrice],
-                    'client_id': [clientId],
-                    'why_held': [whyHeld],
-                    'mkt_cap_price': [mktCapPrice]
-                })
-            ],
-            ignore_index=True
-        )
-        self.order_id = orderId
-        self.contract = contract
-        self.order = order
-        self.order_state = orderState
+    def openOrder(self, orderId:OrderId, contract:Contract, order:Order,
+                  orderState:OrderState):
+        # self.order_status = pd.concat(
+        #     [
+        #         self.order_status,
+        #         pd.DataFrame({
+        #             'order_id': [orderId],
+        #             'status': [orderState.status],
+        #             'filled': [filled],
+        #             'remaining': [remaining],
+        #             'avg_fill_price': [avgFillPrice],
+        #             'perm_id': [permId],
+        #             'parent_id': [parentId],
+        #             'last_fill_price': [lastFillPrice],
+        #             'client_id': [clientId],
+        #             'why_held': [whyHeld],
+        #             'mkt_cap_price': [mktCapPrice]
+        #         })
+        #     ],
+        #     ignore_index=True
+        # )
+        self.order_id_open = orderId
+        self.contract_open = contract
+        self.order_open = order
+        self.order_state_open = orderState
+
+    def openOrderEnd(self):
+        print('openOrder')
+
+    def completedOrder(self, contract:Contract, order:Order,
+                       orderState:OrderState):
+        self.contract_completed = contract
+        self.order_completed = order
+        self.order_state_completed = orderState
+
 
 
 
