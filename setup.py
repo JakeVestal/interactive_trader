@@ -15,7 +15,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="interactive_trader",
-    version="0.1.0",
+    version="0.1.1",
     description="Trade on Interactive Brokers with Plotly Dash in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,5 +36,5 @@ setup(
     ],
     packages=["interactive_trader"],
     include_package_data=True,
-    install_requires=["pandas", "dash", "ibapi"]
+    install_requires=["pandas", "dash", "ibapi", "dash-bootstrap-components"]
 )
